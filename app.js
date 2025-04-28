@@ -61,6 +61,19 @@ function getDiskInfo(){
   console.log(diskInfo)
 }
 
+//Get process info
+function getProcessInfo(){
+  const processInfo = process.info()
+  console.log(processInfo)
+} 
+
+//Get system uptime
+function getSystemUptime(){
+  const uptime = os.uptime()
+  console.log(formatTime(uptime))
+}
+
+
 
 
 
