@@ -13,6 +13,7 @@ function formatBytes(bytes,decimal = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(decimal)) + ' ' + sizes[i];
   }
 
+//?Format seconds to human readable
 function formatTime(seconds) {
   const days = Math.floor(seconds / (3600*24));
   const hours = Math.floor(seconds % ((3600*24)) / 3600);
@@ -21,10 +22,21 @@ function formatTime(seconds) {
   return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
-
-
-  //?Format seconds to human readable
 //Get CPU info
+function getCpuInfo(){
+  const model = os.cpus()[0] .model
+  const cores = os.cpus().length
+  const architecture = os.arch()
+  const loadAvg = os.loadavg()
+  console.log(model,cores,architecture,loadAvg)
+}
+
+
+
+
+
+
+
 //Get memory info
 //Get os info
 //Get network info
