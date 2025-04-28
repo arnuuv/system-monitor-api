@@ -13,9 +13,13 @@ function formatBytes(bytes,decimal = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(decimal)) + ' ' + sizes[i];
   }
 
-
-
-
+function formatTime(seconds) {
+  const days = Math.floor(seconds / (3600*24));
+  const hours = Math.floor(seconds % ((3600*24)) / 3600);
+  const minutes = Math.floor((seconds % 3600)/60);
+  const seconds = Math.floor(seconds % 60);
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
 
 
 
