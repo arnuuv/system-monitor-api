@@ -31,13 +31,17 @@ function getCpuInfo(){
   console.log(model,cores,architecture,loadAvg)
 }
 
-
-
-
-
-
-
 //Get memory info
+function getMemoryInfo(){
+  const total = os.totalmem()
+  console.log(formatBytes(os.totalmem()))
+  console.log(formatBytes(os.freemem()))
+  console.log(formatBytes(os.freemem()/os.totalmem()*100))
+}
+
+
+
+
 //Get os info
 //Get network info
 //Get process
