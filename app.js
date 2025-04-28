@@ -39,10 +39,16 @@ function getMemoryInfo(){
   console.log(formatBytes(os.freemem()/os.totalmem()*100))
 }
 
-
-
-
 //Get os info
+function getOsInfo(){
+  const osType = os.type()
+  const osRelease = os.release()
+  const osVersion = os.version()
+  const osPlatform = os.platform()
+  console.log(osType,osRelease,osVersion,osPlatform)
+}
+
+
 //Get network info
 //Get process
 //! Http Server
