@@ -50,6 +50,24 @@ function getOsInfo(){
 
 
 //Get network info
+function getNetworkInfo(){
+  const networkInterfaces = os.networkInterfaces()
+  console.log(networkInterfaces)
+}
+
+//Get disk info
+function getDiskInfo(){
+  const diskInfo = os.diskUsage()
+  console.log(diskInfo)
+}
+
+
+
+
+
+
+
+
 //Get process
 //! Http Server
 //!Start a server
