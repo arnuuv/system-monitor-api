@@ -71,13 +71,9 @@ function getProcessInfo(){
 function getSystemUptime(){
   const uptime = os.uptime()
   console.log(formatTime(uptime))
+  console.log(formatBytes(os.freemem()))
+  console.log(formatBytes(os.freemem()/os.totalmem()*100))
 }
-
-
-
-
-
-
 
 
 
