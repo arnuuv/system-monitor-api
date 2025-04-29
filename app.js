@@ -60,6 +60,8 @@ function getUserInfo(){
   return os.userInfo()
 }
 
+
+
 //Get network info
 function getNetworkInfo(){
   return os.networkInterfaces()
@@ -67,9 +69,67 @@ function getNetworkInfo(){
 
 //Get disk info
 function getDiskInfo(){
-  // This requires a third-party module like 'diskusage'
-  // For now, return a placeholder message
-  return { error: "Requires additional module like 'diskusage'" }
+  try {
+    const exec = require('child_process').execSync;
+    let diskInfo = {};
+    
+    if (os.platform() === 'win32') {
+      // Windows implementation
+      const drives = exec('wmic logicaldisk get caption,freespace,size /format:csv', { encoding: 'utf8' })
+        .trim()
+        .split('\n')
+        .slice(1) // Skip header
+        .filter(line => line.length > 0);
+      
+      drives.forEach(drive => {
+        const parts = drive.split(',');
+        if (parts.length >= 3) {
+          const driveLetter = parts[1].trim();
+          const freeSpace = parseInt(parts[2], 10) || 0;
+          const totalSize = parseInt(parts[3], 10) || 0;
+          const usedSpace = totalSize - freeSpace;
+          const percentUsed = totalSize > 0 ? ((usedSpace / totalSize) * 100).toFixed(2) : 0;
+          
+          diskInfo[driveLetter] = {
+            total: formatBytes(totalSize),
+            free: formatBytes(freeSpace),
+            used: formatBytes(usedSpace),
+            percentUsed: `${percentUsed}%`
+          };
+        }
+      });
+    } else {
+      // Unix/Linux/macOS implementation
+      const df = exec('df -k', { encoding: 'utf8' })
+        .trim()
+        .split('\n')
+        .slice(1); // Skip header
+      
+      df.forEach(line => {
+        const parts = line.split(/\s+/);
+        if (parts.length >= 6) {
+          const filesystem = parts[0];
+          const mountpoint = parts[5];
+          const totalSize = parseInt(parts[1], 10) * 1024; // Convert KB to bytes
+          const usedSpace = parseInt(parts[2], 10) * 1024;
+          const freeSpace = parseInt(parts[3], 10) * 1024;
+          const percentUsed = parts[4].replace('%', '');
+          
+          diskInfo[mountpoint] = {
+            filesystem,
+            total: formatBytes(totalSize),
+            free: formatBytes(freeSpace),
+            used: formatBytes(usedSpace),
+            percentUsed: `${percentUsed}%`
+          };
+        }
+      });
+    }
+    
+    return diskInfo;
+  } catch (error) {
+    return { error: `Failed to get disk info: ${error.message}` };
+  }
 }
 
 //Get process info
@@ -103,6 +163,7 @@ function getAllSystemInfo() {
     os: getOsInfo(),
     user: getUserInfo(),
     network: getNetworkInfo(),
+    disk: getDiskInfo(),
     process: getProcessInfo(),
     uptime: getSystemUptime()
   }
@@ -161,6 +222,10 @@ const server = http.createServer((req, res) => {
         res.writeHead(200);
         res.end(JSON.stringify(getNetworkInfo()));
         break;
+      case '/api/disk':
+        res.writeHead(200);
+        res.end(JSON.stringify(getDiskInfo()));
+        break;
       case '/api/process':
         res.writeHead(200);
         res.end(JSON.stringify(getProcessInfo()));
@@ -199,15 +264,10 @@ const server = http.createServer((req, res) => {
             <li><code>/api/os</code> - Operating system information</li>
             <li><code>/api/user</code> - User information</li>
             <li><code>/api/network</code> - Network interfaces</li>
+            <li><code>/api/disk</code> - Disk usage information</li>
             <li><code>/api/process</code> - Process information</li>
             <li><code>/api/uptime</code> - System uptime</li>
           </ul>
         </body>
       </html>
-    `);
-  }
-});
-
-server.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
+    `
